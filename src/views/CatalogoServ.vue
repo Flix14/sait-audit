@@ -6,9 +6,19 @@
       </div>
         <br>
        <div class="container text-right">
-  <b-button variant="success">
-    Agregar <b-badge variant="light"></b-badge>
-  </b-button>
+ <div>
+  <b-button variant="outline-success badge-pill" v-b-modal.modal-1>Agregar Servidor</b-button>
+  <b-modal id="modal-1" title="Ingresar nuevo Servidor">
+      <h6>Nombre</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input> 
+     <h6>Proyecto</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input> 
+     <h6>Direccion</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input> 
+     <h6>Dominio</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input>   
+  </b-modal>
+</div>
 </div>
         <br>
         <br>
@@ -20,7 +30,7 @@
           <th scope="col">Proyecto</th>
           <th scope="col">Direccion</th>
           <th scope="col">Dominio</th>
-          <th class="text-right">Servidores</th>
+          
           <th class="text-right">Action</th>
       </tr>
     </thead>
@@ -30,11 +40,22 @@
           <td>Factura123</td>
           <td>192.132.14</td>
           <td>null</td>
+          
           <td class="text-right">
-            <button class="btn btn-outline-success badge-pill" style="width:80px;">Checar</button>
-          </td>
-          <td class="text-right">
-            <button class="btn btn-outline-info badge-pill" style="width:80px;">Editar</button>
+             <div>
+  <b-button  variant="btn btn-outline-info badge-pill" style="width:90px; margin: 5px;" v-b-modal.modal-2>Editar</b-button>
+
+  <b-modal id="modal-2" title="Editar los siguientes campos">
+     <h6>Nombre</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input> 
+     <h6>Proyecto</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input> 
+     <h6>Direccion</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input> 
+     <h6>Dominio</h6>
+     <b-form-input v-model="text" placeholder="Enter your name"></b-form-input>  
+  </b-modal>
+            </div>
           </td>
       </tr>
        <tr>
@@ -42,9 +63,7 @@
           <td>Sait Boveda</td>
           <td>192.132.14</td>
           <td>null</td>
-          <td class="text-right">
-            <button class="btn btn-outline-success badge-pill" style="width:80px;">Checar</button>
-          </td>
+          
           <td class="text-right">
             <button class="btn btn-outline-info badge-pill" style="width:80px;">Editar</button>
           </td>
@@ -54,9 +73,7 @@
           <td>SAIT SYNC</td>
           <td>192.132.14</td>
           <td>null</td>
-          <td class="text-right">
-            <button class="btn btn-outline-success badge-pill" style="width:80px;">Checar</button>
-          </td>
+          
           <td class="text-right">
             <button class="btn btn-outline-info badge-pill" style="width:80px;">Editar</button>
           </td>
@@ -66,9 +83,7 @@
           <td>Sait Boveda</td>
           <td>192.132.14</td>
           <td>null</td>
-          <td class="text-right">
-            <button class="btn btn-outline-success badge-pill" style="width:80px;">Checar</button>
-          </td>
+          
           <td class="text-right">
             <button class="btn btn-outline-info badge-pill" style="width:80px;">Editar</button>
           </td>
