@@ -1,56 +1,57 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import CatalogoUs from '../views/CatalogoUs.vue'
-import CatalogoProy from '../views/CatalogoProy.vue'
-import CatalogoServ from '../views/CatalogoServ.vue'
+import Usuarios from '../views/Usuarios.vue'
+import Proyectos from '../views/Proyectos.vue'
+import Servidores from '../views/Servidores.vue'
 import Auditorias from '../views/Auditorias.vue'
-import Eventos from '../views/Eventos.vue'
-
-
+import DetallesAuditoria from '../views/DetallesAuditoria.vue'
+import NuevaAuditoria from '../views/NuevaAuditoria.vue'
+import GoogleAuth from '../views/GoogleAuth.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
+    name: 'googleAuth',
+    component: GoogleAuth
+  },
+  {
+    path: '/home',
     name: 'home',
     component: Home
   },
   {
-    path: '/catalogoUs',
-    name: 'catalogoUs',
-    component: CatalogoUs
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    //component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/usuarios',
+    name: 'usuarios',
+    component: Usuarios
   },
   {
-    path: '/catalogoProy',
-    name: 'catalogoProy',
-    component: CatalogoProy
-    
+    path: '/proyectos',
+    name: 'proyectos',
+    component: Proyectos
   },
   {
-    path: '/catalogoServ',
-    name: 'catalogoServ',
-    component: CatalogoServ
-    
+    path: '/servidores',
+    name: 'servidores',
+    component: Servidores
   },
   {
     path: '/auditorias',
     name: 'auditorias',
     component: Auditorias
-    
   },
   {
-    path: '/eventos',
-    name: 'eventos',
-    component: Eventos
-    
+    path: '/auditorias/:id',
+    name: 'auditoria',
+    component: DetallesAuditoria
+  },
+  {
+    path: '/auditorias/nueva/auditoria',
+    name: 'nuevaAuditoria',
+    component: NuevaAuditoria
   }
- 
 ]
 
 const router = new VueRouter({
