@@ -26,6 +26,7 @@
               </b-dropdown>
             </template>
           </vue-bootstrap-typeahead>
+          <br>
           <b-dropdown :text="filtroFecha" variant="light">
             <b-dropdown-item @click="filtrarCualquierFecha">De cualquier fecha</b-dropdown-item>
             <b-dropdown-item @click="filtrarFechaHoy">Hoy</b-dropdown-item>
@@ -89,7 +90,6 @@ export default {
       filtroFecha: 'De cualquier fecha',
       limitInf: "0000-00-00T00:00:00",
       limitSup: "",
-      typeAheadData: [],
       conexion: true
     }
   },
@@ -224,13 +224,18 @@ export default {
   },
   watch: {
     currentPage: function() {
-      this.getAuditorias()
+      if(this.query == '') {
+        this.getAuditorias()
+      } else {
+        this.setFilters()
+      }
     },
-    query: function() { //Repara backend para las demás tablas para que devuelva número de elementos con filtros
-      this.typeAheadData = []
+    query: function() {
+      this.currentPage = 1
       this.setFilters()
     },
     filtroFecha: function() {
+      this.currentPage = 1
       this.setFilters()
     },
     tipoBusqueda: function() {

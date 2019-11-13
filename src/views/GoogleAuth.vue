@@ -28,7 +28,7 @@ export default {
     getUsuario(usuario){
       let email = usuario.data.w3.U3
       this.isAuth = usuario.isAuth
-      axios.get(`${this.$store.getters.getDireccion}/usuarios?email=${email}`).then((res) => {
+      axios.get(`${this.$store.getters.getDireccion}/usuarios?pagina=1&email=${email}`).then((res) => {
           this.usuarioDB = res.data.usuarios
         }).catch(() => {
           this.handleClickSignOut()

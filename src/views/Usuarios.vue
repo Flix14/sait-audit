@@ -39,7 +39,7 @@
       </b-form-radio-group>
     </b-form-group>
     </div>
-    <Tabla :usuarios="usuarios" @estadoUpdating="query == '' ? getUsuarios : getUsuariosPerQuery(query)"/>
+    <Tabla :usuarios="usuarios" @estadoUpdating="updateList"/>
     <div class="container text-center" v-if="usuarios.length == 0">
       <p v-if="!conexion">No hay conexión con el servidor</p>
       <p v-else>No hay datos en la tabla</p>
@@ -99,18 +99,20 @@ export default {
         this.conexion = true
       }).catch(() => this.conexion = false)
     },
-    getUsuariosPerQuery(newQuery){
+    getUsuariosPerQuery(){
+      let newQuery = this.query
       let selectQuery
       if (newQuery != "") {
         if(this.filtroEstadoSelected == 'todos'){
-          selectQuery = `${this.$store.getters.getDireccion}/usuarios?email=${newQuery}`
+          selectQuery = `${this.$store.getters.getDireccion}/usuarios?pagina=${this.currentPage}&email=${newQuery}`
         }else {
-          selectQuery = `${this.$store.getters.getDireccion}/usuarios?email=${newQuery}&estado=${this.filtroEstadoSelected}`
+          selectQuery = `${this.$store.getters.getDireccion}/usuarios?pagina=${this.currentPage}&email=${newQuery}&estado=${this.filtroEstadoSelected}`
         }
         axios.get(selectQuery).then((res) => {
           this.usuarios = res.data.usuarios
-          this.rows = res.data.usuarios.length
-          this.rowsPerPage = res.data.usuarios.length
+          this.pagina = res.data.pagina
+          this.rows = this.pagina.total_elementos
+          this.rowsPerPage = 10
         }).catch(() => {
             this.usuarios = []
             this.query = ''
@@ -120,6 +122,13 @@ export default {
       } else {
         this.getUsuarios()
       }
+    },
+    updateList() {
+      if(this.query == '') {
+        this.getUsuarios()
+      } else {
+        this.getUsuariosPerQuery()
+      }
     }
   },
   mounted() {
@@ -127,12 +136,18 @@ export default {
   },
   watch: {
     currentPage: function() {
-      this.getUsuarios()
+      if(this.query == '') {
+        this.getUsuarios()
+      } else {
+        this.getUsuariosPerQuery()
+      }
     },
-    query: function(newQuery) {
-      this.getUsuariosPerQuery(newQuery)
+    query: function() {
+      this.currentPage = 1
+      this.getUsuariosPerQuery()
     },
     filtroEstadoSelected: function() {
+      this.currentPage = 1
       this.getUsuarios()
     }
   }

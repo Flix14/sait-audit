@@ -82,6 +82,25 @@ export default {
         this.$refs.proyectTypeAhead.inputValue = ''
         this.conexion = true
       }).catch(() => this.conexion = false)
+    },
+    getProyectosPerQuery() {
+      let newQuery = this.query
+      if (newQuery != "") {
+        axios.get(`${this.$store.getters.getDireccion}/proyectos?pagina=${this.currentPage}&nombre=${newQuery}`).then((res) => {
+          this.proyectos = res.data.proyectos
+          this.pagina = res.data.pagina
+          this.rows = this.pagina.total_elementos
+          this.rowsPerPage = 10
+        }).catch((e) => {
+          this.proyectos = []
+          this.query = ''
+          this.$refs.proyectTypeAhead.inputValue = ''
+          this.$refs.btnAgregarProyecto.focus()
+          console.log(e)
+        })
+      } else {
+        this.getProyectos()
+      }
     }
   },
   mounted() {
@@ -89,23 +108,15 @@ export default {
   },
   watch: {
     currentPage: function() {
-      this.getProyectos()
-    },
-    query: function(newQuery) {
-      if (newQuery != "") {
-        axios.get(`${this.$store.getters.getDireccion}/proyectos?nombre=${newQuery}`).then((res) => {
-          this.proyectos = res.data.proyectos
-          this.rows = res.data.proyectos.length
-          this.rowsPerPage =res.data.proyectos.length
-        }).catch(() => {
-          this.proyectos = []
-          this.query = ''
-          this.$refs.proyectTypeAhead.inputValue = ''
-          this.$refs.btnAgregarProyecto.focus()
-        })
-      } else {
+      if(this.query == '') {
         this.getProyectos()
+      } else {
+        this.getProyectosPerQuery()
       }
+    },
+    query: function() {
+      this.currentPage = 1
+      this.getProyectosPerQuery()
     }
   }
 }

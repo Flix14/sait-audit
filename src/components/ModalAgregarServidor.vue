@@ -110,7 +110,11 @@ export default {
           return value
         }
       }
-      return value.slice(0, value.length - 1)
+      if(event.type == 'input') {
+        return value.slice(0, value.length - 1)
+      } else {
+        return value.slice(0, value.length)
+      }
     }
   },
   computed: {

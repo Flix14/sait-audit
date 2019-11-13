@@ -90,22 +90,16 @@ export default {
         this.$refs.servTypeAhead.inputValue = ''
         this.conexion = true
       }).catch(() => this.conexion = false)
-    }
-  },
-  mounted() {
-    this.getServidores()
-  },
-  watch: {
-    currentPage: function() {
-      this.getServidores()
     },
-    query: function(newQuery) {
+    getServidoresPerQuery() {
+      let newQuery = this.query
       if (newQuery != "") {
         if (this.tipoBusqueda == "Dirección pública") {
-          axios.get(`${this.$store.getters.getDireccion}/servidores?direccion_publica=${newQuery}`).then((res) => {
+          axios.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}&direccion_publica=${newQuery}`).then((res) => {
             this.servidores = res.data.servidores
-            this.rows = res.data.servidores.length
-            this.rowsPerPage = res.data.servidores.length
+            this.pagina = res.data.pagina
+            this.rows = this.pagina.total_elementos
+            this.rowsPerPage = 10
           }).catch(() => {
             this.servidores = []
             this.query = ''
@@ -115,7 +109,7 @@ export default {
         } else {
           var listaServidores = []
           this.dominios = []
-          axios.get(`${this.$store.getters.getDireccion}/servidores?dominio=${newQuery}`).then((res) => {
+          axios.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}&dominio=${newQuery}`).then((res) => {
             listaServidores = res.data.servidores
             this.servidores = listaServidores
             listaServidores.forEach(servidor => {
@@ -123,8 +117,9 @@ export default {
                 this.dominios.push(dominio.dominio)
               })
             })
-            this.rows = res.data.servidores.length
-            this.rowsPerPage = res.data.servidores.length
+            this.pagina = res.data.pagina
+            this.rows = this.pagina.total_elementos
+            this.rowsPerPage = 10
           }).catch(() => {
             this.servidores = []
             this.query = ''
@@ -135,8 +130,25 @@ export default {
       } else {
         this.getServidores()
       }
+    }
+  },
+  mounted() {
+    this.getServidores()
+  },
+  watch: {
+    currentPage: function() {
+      if(this.query == '') {
+        this.getServidores()
+      } else {
+        this.getServidoresPerQuery()
+      }
+    },
+    query: function() {
+      this.currentPage = 1
+      this.getServidoresPerQuery()
     },
     tipoBusqueda: function() {
+      this.currentPage = 1
       this.getServidores()
     }
   }
