@@ -60,7 +60,7 @@ export default {
         })
         usuario.estado = response.data.estado
         this.$emit('estadoUpdating')
-      }). catch(e => console.log(e))
+      }).catch(() => alert("No hay conexión con la base de datos"))
     },
     updateListUsuarios(newUsuario) {
       var oldUsuario = this.usuarios.find(element => {

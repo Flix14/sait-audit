@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="modalAgregarProyecto" title="Ingresar nuevo proyecto" centered @hidden="cleanModal()">
+  <b-modal id="modalAgregarProyecto" title="Ingresar nuevo proyecto" centered @hidden="cleanModal()" @shown="getServidores">
     <h6>Nombre</h6>
     <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
       <b-input placeholder="Nombre" v-model="nombre" :state="changeStateInputNombre"></b-input>
@@ -67,7 +67,10 @@ export default {
         listaServidores.forEach(servidor => {
         this.servidoresExistentes.push({value: servidor.id, text: servidor.direccion_publica})
       })
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        this.closeModal()
+        alert("No hay conexión con el servidor")
+      })
     },
     addProyecto() {
       var servidorVacio = false
@@ -85,7 +88,10 @@ export default {
           }).then(() => {
             this.$emit('proyectoAdding')
             this.closeModal()
-          }).catch(e => console.log(e))
+          }).catch(() => {
+            this.closeModal()
+            alert("No hay conexión con el servidor")
+          })
         } else {
           alert("Ingrese servidores")
         }
@@ -93,9 +99,6 @@ export default {
         alert("Ingrese todos los campos necesarios")
       }
     }
-  },
-  mounted(){
-    this.getServidores()
   },
   computed: {
     changeStateInputNombre: function() {

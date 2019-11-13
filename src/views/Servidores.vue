@@ -11,7 +11,7 @@
         <b-col>
           <vue-bootstrap-typeahead
             ref="servTypeAhead"
-            class="mb-4"
+            :class="servidores.length == 0 && query == '' ? 'disabled' : ''"
             v-model="query"
             :data="tipoBusqueda == 'Dirección pública' ? servidores : dominios"
             :serializer="data => tipoBusqueda == 'Dirección pública' ? data.direccion_publica : data"
@@ -27,6 +27,7 @@
         </b-col>
         <b-col class="text-right">
           <b-button 
+            ref="btnAgregarServidor"
             variant="outline-success" 
             v-b-modal.modalAgregarServidor>
             Agregar Servidor
@@ -37,13 +38,17 @@
     <br>
     <Tabla :servidores="servidores"/>
     <ModalAgregarServidor @servidorAdding="getServidores"/>
+    <div class="container text-center" v-if="servidores.length == 0">
+      <p v-if="!conexion">No hay conexión con el servidor</p>
+      <p v-else>No hay datos en la tabla</p>
+    </div>
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
       :per-page="rowsPerPage"
       aria-controls="tablaServidores"
       align="center"
-      :hidden="rowsPerPage == 10 ? false : true"
+      :hidden="rowsPerPage != 10 || servidores.length == 0"
     ></b-pagination>
   </div>
 </template>
@@ -70,7 +75,8 @@ export default {
       rows: 10,
       rowsPerPage: 10,
       query: "",
-      tipoBusqueda: "Dirección pública"
+      tipoBusqueda: "Dirección pública",
+      conexion: true
     }
   },
   methods: {
@@ -82,7 +88,8 @@ export default {
         this.rowsPerPage = 10
         this.query = ''
         this.$refs.servTypeAhead.inputValue = ''
-      }).catch(e => console.log(e))
+        this.conexion = true
+      }).catch(() => this.conexion = false)
     }
   },
   mounted() {
@@ -99,7 +106,12 @@ export default {
             this.servidores = res.data.servidores
             this.rows = res.data.servidores.length
             this.rowsPerPage = res.data.servidores.length
-          }) 
+          }).catch(() => {
+            this.servidores = []
+            this.query = ''
+            this.$refs.servTypeAhead.inputValue = ''
+            this.$refs.btnAgregarServidor.focus()
+          })
         } else {
           var listaServidores = []
           this.dominios = []
@@ -110,10 +122,15 @@ export default {
               servidor.dominios.forEach(dominio => {
                 this.dominios.push(dominio.dominio)
               })
-            });
+            })
             this.rows = res.data.servidores.length
             this.rowsPerPage = res.data.servidores.length
-          }) 
+          }).catch(() => {
+            this.servidores = []
+            this.query = ''
+            this.$refs.servTypeAhead.inputValue = ''
+            this.$refs.btnAgregarServidor.focus()
+          })
         }
       } else {
         this.getServidores()

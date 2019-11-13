@@ -11,7 +11,7 @@
         <b-col>
           <vue-bootstrap-typeahead
             ref="auditTypeAhead"
-            class="mb-4"
+            :class="auditorias.length == 0 && query == '' ? 'disabled' : ''"
             v-model="query"
             :data="auditorias"
             :serializer="auditoria => changeSerializer(auditoria)"
@@ -38,6 +38,7 @@
         </b-col>
         <b-col class="text-right">
           <b-button 
+            ref="btnNuevaAuditoria"
             variant="outline-success" 
             :to="{name: 'nuevaAuditoria'}">
             Nueva Auditoria
@@ -48,13 +49,17 @@
     <br>
     <Tabla :auditorias="auditorias"/>
     <ModalFechaPersonalizada @sendingFechas="filtrarFechaPersonalizada" />
+    <div class="container text-center" v-if="auditorias.length == 0">
+      <p v-if="!conexion">No hay conexión con el servidor</p>
+      <p v-else>No hay datos en la tabla</p>
+    </div>
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
       :per-page="rowsPerPage"
       aria-controls="tablaAuditorias"
       align="center"
-      :hidden="rowsPerPage == 10 ? false : true"
+      :hidden="rowsPerPage != 10 || auditorias.length == 0"
     ></b-pagination>
   </div>
 </template>
@@ -84,7 +89,8 @@ export default {
       filtroFecha: 'De cualquier fecha',
       limitInf: "0000-00-00T00:00:00",
       limitSup: "",
-      typeAheadData: []
+      typeAheadData: [],
+      conexion: true
     }
   },
   methods: {
@@ -95,7 +101,8 @@ export default {
         this.pagina = response.data.pagina
         this.rows = this.pagina.total_elementos
         this.rowsPerPage = 10
-      }).catch(e => console.log(e))
+        this.conexion = true
+      }).catch(() => this.conexion = false)
     },
     changeSerializer(/*auditoria*/){ //Arreglar
       if(this.tipoBusqueda == 'Motivo') {
@@ -123,7 +130,6 @@ export default {
     },
     filtrarFechaHoy() {
       let fechaHoy = new Date()
-      //limit_inf de - limit_sup hasta
       this.limitInf = fechaHoy.getFullYear() + '-' + (fechaHoy.getMonth()+1)  + '-' + fechaHoy.getDate() + 'T'  + '00:00:00'
       this.limitSup = this.getFechaYHora()
       this.filtroFecha = 'Hoy'
@@ -153,7 +159,7 @@ export default {
       this.setFilters() //Ver si se puede mejorar
     },
     setFilters() {
-      var newQuery = this.query //Arreglar esto y de paso agregar `` en las operaciones donde se use ''
+      var newQuery = this.query //Arreglar esto 
       if (newQuery != "") {
         if (this.tipoBusqueda == "Motivo") {
           axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&motivo=${newQuery}`)
@@ -161,7 +167,12 @@ export default {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
             this.rowsPerPage = 10 //Cambiar todo esto, es innecesaria esta variable
-          }) 
+          }).catch(() => {
+            this.auditorias = []
+            this.query = ''
+            this.$refs.auditTypeAhead.inputValue = ''
+            this.$refs.btnNuevaAuditoria.focus()
+          })
         }
         if (this.tipoBusqueda == "Proyecto") {
           axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&nombre_proyecto=${newQuery}`)
@@ -169,6 +180,11 @@ export default {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
             this.rowsPerPage = 10
+          }).catch(() => {
+            this.auditorias = []
+            this.query = ''
+            this.$refs.auditTypeAhead.inputValue = ''
+            this.$refs.btnNuevaAuditoria.focus()
           }) 
         }
         if (this.tipoBusqueda == "IP Servidor") {
@@ -177,7 +193,12 @@ export default {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
             this.rowsPerPage = 10
-          }) 
+          }).catch(() => {
+            this.auditorias = []
+            this.query = ''
+            this.$refs.auditTypeAhead.inputValue = ''
+            this.$refs.btnNuevaAuditoria.focus()
+          })
         }
         if (this.tipoBusqueda == "Usuario") {
           axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&usuario=${newQuery}`)
@@ -185,7 +206,12 @@ export default {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
             this.rowsPerPage = 10
-          }) 
+          }).catch(() => {
+            this.auditorias = []
+            this.query = ''
+            this.$refs.auditTypeAhead.inputValue = ''
+            this.$refs.btnNuevaAuditoria.focus()
+          })
         }
       } else {
         this.getAuditorias()

@@ -19,6 +19,10 @@
     </div>
     <br>
     <TablaAuditorias :auditorias="auditorias"/>
+    <div class="container text-center" v-if="auditorias.length == 0">
+      <p v-if="!conexion">No hay conexión con el servidor</p>
+      <p v-else>No hay datos en la tabla</p>
+    </div>
   </div>
 </template>
 
@@ -36,7 +40,8 @@ export default {
   },
   data() {
     return {
-      auditorias: []
+      auditorias: [],
+      conexion: true
     }
   },
   methods: {
@@ -47,7 +52,8 @@ export default {
         this.pagina = response.data.pagina
         this.rows = this.pagina.total_elementos
         this.rowsPerPage = 10
-      }).catch(e => console.log(e))
+        this.conexion = true
+      }).catch(() => this.conexion = false)
     }
   },
   mounted() {

@@ -30,15 +30,17 @@ export default {
       this.isAuth = usuario.isAuth
       axios.get(`${this.$store.getters.getDireccion}/usuarios?email=${email}`).then((res) => {
           this.usuarioDB = res.data.usuarios
-        }).catch(e => console.log(e))
+        }).catch(() => {
+          this.handleClickSignOut()
+          alert('No hay conexión con el servidor')
+        })
     },
     handleClickSignOut(){
       this.$gAuth.signOut()
       .then(() => {
-        alert("No tiene autorización para entrar al sistema")
       })
       .catch(error  => {
-        console.log(error)
+        alert(error)
       })
     }
   },
@@ -49,6 +51,7 @@ export default {
         this.$router.push({name: 'home'})
       } else{
         this.handleClickSignOut()
+        alert("No tiene autorización para entrar al sistema")
       }
     }
   }

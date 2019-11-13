@@ -31,7 +31,10 @@ export default {
     getProyecto() {
       axios.get(`${this.$store.getters.getDireccion}/proyectos/${this.idProyecto}`).then(response => {
         this.nombre = response.data.nombre
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        this.closeModal()
+        alert("No hay conexión con el servidor")
+      })
     },
     closeModal() {
       this.$bvModal.hide("modalEditarProyecto")
@@ -44,7 +47,10 @@ export default {
         var proyecto = response.data
         this.$emit('proyectoUpdating', proyecto)
         this.closeModal()
-      }). catch(e => console.log(e))
+      }).catch(() => {
+        this.closeModal()
+        alert("No hay conexión con el servidor")
+      })
       } else {
         alert("Favor de ingresar un nombre")
       }

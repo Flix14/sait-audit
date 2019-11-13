@@ -97,7 +97,10 @@ export default {
         listaProyectos.forEach(proyecto => {
         this.proyectos.push({value: proyecto.id, text: proyecto.nombre})
       })
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        alert("No hay conexión con el servidor")
+        this.$router.push({name: 'home'})
+      })
     },
     getServidores(){
       var listaServidores = []
@@ -106,7 +109,10 @@ export default {
         listaServidores.forEach(servidor => {
         this.servidores.push({value: servidor.id, text: servidor.direccion_publica})
       })
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        alert("No hay conexión con el servidor")
+        this.$router.push({name: 'home'})
+      })
     },
     guardarAuditoria() {
       if(this.changeStateInputProyecto && this.changeStateInputServidor && this.changeStateInputMotivo && this.changeStateInputMotivoOtro && this.changeStateInputComandos) {
@@ -121,7 +127,9 @@ export default {
         //Enviar mensaje o hacer algo con esto
         alert(`La auditoría #${response.data.id} ha sido guardada`)
         this.$router.push({name: 'home'})
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        alert("No hay conexión con el servidor")
+      })
       } else {
         alert("Favor de llenar los campos marcados")
       }

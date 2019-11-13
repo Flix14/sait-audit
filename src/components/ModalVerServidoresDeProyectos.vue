@@ -12,6 +12,10 @@
         </tr>
       </tbody>
     </table>
+    <div class="container text-center" v-if="servidores.length == 0">
+      <p v-if="!conexion">No hay conexión con el servidor</p>
+      <p v-else>No hay datos en la tabla</p>
+    </div>
     <template v-slot:modal-footer="{ Cerrar }">
       <b-button size="sm" variant="danger" @click="closeModal()">
         Cerrar
@@ -29,7 +33,8 @@ export default {
   },
   data() {
     return {
-      servidores: []
+      servidores: [],
+      conexion: true
     }
   },
   methods: {
@@ -45,8 +50,9 @@ export default {
         listaServidores = response.data
         listaServidores.forEach(servidor => {
         this.servidores.push({id: servidor.id, direccion_publica: servidor.direccion_publica})
+        this.conexion = true
       })
-      }).catch(e => console.log(e))
+      }).catch(() => this.conexion = false)
     }
   }
 }

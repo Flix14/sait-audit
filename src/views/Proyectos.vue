@@ -11,7 +11,7 @@
         <b-col>
           <vue-bootstrap-typeahead
             ref="proyectTypeAhead"
-            class="mb-4"
+            :class="proyectos.length == 0 && query == '' ? 'disabled' : ''"
             v-model="query"
             :data="proyectos"
             :serializer="proyecto => proyecto.nombre"
@@ -21,7 +21,8 @@
         </b-col>
         <b-col class="text-right">
           <b-button 
-            variant="outline-success badge-pill" 
+            ref="btnAgregarProyecto"
+            variant="outline-success" 
             v-b-modal.modalAgregarProyecto>
             Agregar Proyecto
           </b-button>
@@ -31,13 +32,17 @@
     <br>
     <Tabla :proyectos="proyectos"/>
     <ModalAgregarProyecto @proyectoAdding="getProyectos"/>
+    <div class="container text-center" v-if="proyectos.length == 0">
+      <p v-if="!conexion">No hay conexión con el servidor</p>
+      <p v-else>No hay datos en la tabla</p>
+    </div>
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
       :per-page="rowsPerPage"
       aria-controls="tablaProyectos"
       align="center"
-      :hidden="rowsPerPage == 10 ? false : true"
+      :hidden="rowsPerPage != 10 || proyectos.length == 0"
     ></b-pagination>
   </div>
 </template>
@@ -62,7 +67,8 @@ export default {
       currentPage: 1,
       rows: 10,
       rowsPerPage: 10,
-      query: ""
+      query: "",
+      conexion: true
     }
   },
   methods: {
@@ -74,7 +80,8 @@ export default {
         this.rowsPerPage = 10
         this.query = ''
         this.$refs.proyectTypeAhead.inputValue = ''
-      }).catch(e => console.log(e))
+        this.conexion = true
+      }).catch(() => this.conexion = false)
     }
   },
   mounted() {
@@ -90,17 +97,16 @@ export default {
           this.proyectos = res.data.proyectos
           this.rows = res.data.proyectos.length
           this.rowsPerPage =res.data.proyectos.length
-        }) 
+        }).catch(() => {
+          this.proyectos = []
+          this.query = ''
+          this.$refs.proyectTypeAhead.inputValue = ''
+          this.$refs.btnAgregarProyecto.focus()
+        })
       } else {
         this.getProyectos()
       }
     }
   }
 }
-/*
-Lo que falta por mejorar:
-  -Eliminar inf de los modales al cerrarlos de cualquier forma
-  -Eliminar información del typeahead al agregar un nuevo registro
-  -Habilitar el funcionamiento del botón servidores en Proyectos
-*/
 </script>

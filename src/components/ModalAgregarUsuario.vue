@@ -40,7 +40,7 @@ export default {
       }).then(() => {
         this.$emit('usuarioAdding')
         this.closeModal()
-      }). catch(e => console.log(e))
+      }).catch(() => alert("No hay conexión con el servidor"))
       } else {
         alert("Ingrese un email válido")
       }

@@ -12,6 +12,10 @@
         </tr>
       </tbody>
     </table>
+    <div class="container text-center" v-if="proyectos.length == 0">
+      <p v-if="!conexion">No hay conexión con el servidor</p>
+      <p v-else>No hay datos en la tabla</p>
+    </div>
     <template v-slot:modal-footer="{ Cerrar }">
       <b-button size="sm" variant="danger" @click="closeModal()">
         Cerrar
@@ -29,7 +33,8 @@ export default {
   },
   data() {
     return {
-      proyectos: []
+      proyectos: [],
+      conexion: true
     }
   },
   methods: {
@@ -45,8 +50,9 @@ export default {
         listaProyectos = response.data
         listaProyectos.forEach(proyecto => {
         this.proyectos.push({id: proyecto.id, nombre: proyecto.nombre})
+        this.conexion = true
       })
-      }).catch(e => console.log(e))
+      }).catch(() => this.conexion = false)
     }
   }
 }

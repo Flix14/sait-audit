@@ -35,7 +35,10 @@ export default {
         this.sistemaOperativo = response.data.sistema_operativo
         this.direccion = response.data.direccion_publica
         this.dominio = response.data.dominio
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        this.closeModal()
+        alert("No hay conexión con el servidor")
+      })
     },
     closeModal() {
       this.$bvModal.hide("modalEditarServidor")
@@ -50,7 +53,10 @@ export default {
         var servidor = response.data
         this.$emit('servidorUpdating', servidor)
         this.closeModal()
-      }). catch(e => console.log(e))
+      }).catch(() => {
+        this.closeModal()
+        alert("No hay conexión con el servidor")
+      })
       } else {
         alert("Ingresar un sistema operativo")
       }

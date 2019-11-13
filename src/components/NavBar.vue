@@ -35,9 +35,6 @@ export default {
       .then(user => {
         this.$emit('newLoggin', {data: user, isAuth: this.isAuthorized})
       })
-      .catch(error  => {
-        console.log(error)
-      })
     },
     handleClickSignOut(){
       this.$gAuth.signOut()
@@ -45,9 +42,6 @@ export default {
         this.$store.commit('changeUsuario', {email: null, id: null})
         this.isSignIn = this.$gAuth.isAuthorized
         this.$router.push({name: 'googleAuth'})
-      })
-      .catch(error  => {
-        console.log(error)
       })
     }
   },
@@ -62,6 +56,8 @@ export default {
         } else if(this.$route.name != 'googleAuth') {
           this.$store.commit('changeUsuario', {email: null, id: null})
           this.$router.push({name: 'googleAuth'})
+        } else {
+          this.$store.commit('changeUsuario', {email: null, id: null})
         }
       }
     }, 100)

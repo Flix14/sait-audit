@@ -34,7 +34,10 @@ export default {
       axios.get(`${this.$store.getters.getDireccion}/usuarios/${this.idUsuario}`).then(response => {
         this.email = response.data.email
         this.estado = response.data.estado
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        this.closeModal()
+        alert("No hay conexión con el servidor")
+      })
     },
     closeModal() {
       this.$bvModal.hide("modalEditarUsuario")
@@ -48,7 +51,7 @@ export default {
           var usuario = response.data
           this.$emit('usuarioUpdating', usuario)
           this.closeModal()
-        }). catch(e => console.log(e))
+        }).catch(() => alert("No hay conexión con el servidor"))
       } else {
         alert("Favor de ingresar un email")
       }

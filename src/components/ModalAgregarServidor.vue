@@ -81,7 +81,10 @@ export default {
           }).then(() => {
             this.$emit('servidorAdding')
             this.closeModal()
-          }).catch(e => console.log(e)) 
+          }).catch(() => {
+            this.closeModal()
+            alert("No hay conexión con el servidor")
+          })
         } else {
           alert("Ingrese dominios")
         }

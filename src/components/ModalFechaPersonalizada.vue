@@ -65,6 +65,11 @@ export default {
         this.fechaFin = this.fecha
       }
     }
+  },
+  created() {
+    let fechaHoy = new Date()
+    this.fechaInicio = fechaHoy.getFullYear() + '-' + (fechaHoy.getMonth()+1)  + '-' + fechaHoy.getDate()
+    this.fechaFin = fechaHoy.getFullYear() + '-' + (fechaHoy.getMonth()+1)  + '-' + fechaHoy.getDate()
   }
 }
 </script>

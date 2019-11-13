@@ -72,7 +72,10 @@ export default {
     getAuditoria(){
       axios.get(`${this.$store.getters.getDireccion}/auditorias/${this.idAuditoria}`).then(response => {
         this.auditoria = response.data
-      }).catch(e => console.log(e))
+      }).catch(() => {
+        alert("No hay conexión con el servidor")
+        this.$router.push({name: 'auditorias'})
+      })
     }
   },
   mounted(){
