@@ -3,10 +3,11 @@
     <table class="table table-dark table-hover table-bordered" >
       <thead>
         <tr>
-          <th scope="col">Dirección pública</th>
-          <th scope="col">Sistema operativo</th>
-          <th scope="col">Dominios</th> 
-          <th class="text-right">Acción</th>
+          <th>Dirección pública</th>
+          <th>Sistema operativo</th>
+          <th>Dominios</th> 
+          <th class="text-center">Proyectos</th>
+          <th class="text-center">Acción</th>
         </tr>
       </thead>
       <tbody>
@@ -16,17 +17,17 @@
           <td>{{servidor.dominio}}
             <p v-for="dominio in servidor.dominios" :key="dominio.id">{{dominio.dominio}}</p>
           </td>
-          <td class="text-right">
+          <td class="text-center">
             <b-button 
               variant="btn btn-outline-success badge-pill" 
-              style="width:120px;"
-              @click="servidorSeleccionado = servidor; $bvModal.show('modalVerProyectosDeServidores')">
+              @click="openModalVer(servidor)">
               Ver proyectos
             </b-button>
+          </td>
+          <td class="text-center">
             <b-button 
               variant="btn btn-outline-info badge-pill"  
-              style="width:90px; margin: 5px;" 
-              @click="servidorSeleccionado = servidor; $bvModal.show('modalEditarServidor')">
+              @click="openModalEditar(servidor)">
               Editar
             </b-button>
           </td>
@@ -48,7 +49,7 @@ export default {
     ModalVerProyectosDeServidores
   },
   props: {
-    servidores: null
+    servidores: Array
   },
   data() {
     return {
@@ -57,10 +58,18 @@ export default {
   },
   methods: {
     updateListServidores(newServidor) {
-      var oldServidor = this.servidores.find(element => {
-          return element.id == newServidor.id
+      var oldServidor = this.servidores.find(servidor => {
+          return servidor.id == newServidor.id
         })
       oldServidor.sistema_operativo = newServidor.sistema_operativo
+    },
+    openModalEditar(servidor) {
+      this.servidorSeleccionado = servidor 
+      this.$bvModal.show('modalEditarServidor')
+    },
+    openModalVer(servidor) {
+      this.servidorSeleccionado = servidor
+      this.$bvModal.show('modalVerProyectosDeServidores')
     }
   }
 }

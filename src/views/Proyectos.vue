@@ -1,5 +1,5 @@
 <template>
-  <div class="proyectos">
+  <div>
     <NavBar/>
     <br>
     <div class="text-center">
@@ -39,22 +39,19 @@
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
-      :per-page="rowsPerPage"
-      aria-controls="tablaProyectos"
+      :per-page="10"
       align="center"
-      :hidden="rowsPerPage != 10 || proyectos.length == 0"
+      :hidden="proyectos.length == 0"
     ></b-pagination>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Tabla from '@/components/TablaProyectos.vue'
 import ModalAgregarProyecto from '@/components/ModalAgregarProyecto.vue'
 import NavBar from '@/components/NavBar.vue'
 
 export default {
-  name: 'proyectos',
   components: {
     Tabla,
     ModalAgregarProyecto,
@@ -63,21 +60,17 @@ export default {
   data() {
     return {
       proyectos: [],
-      pagina: null,
       currentPage: 1,
       rows: 10,
-      rowsPerPage: 10,
-      query: "",
+      query: '',
       conexion: true
     }
   },
   methods: {
     getProyectos(){
-      axios.get(`${this.$store.getters.getDireccion}/proyectos?pagina=${this.currentPage}`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/proyectos?pagina=${this.currentPage}`).then(response => {
         this.proyectos = response.data.proyectos
-        this.pagina = response.data.pagina
-        this.rows = this.pagina.total_elementos
-        this.rowsPerPage = 10
+        this.rows = response.data.pagina.total_elementos
         this.query = ''
         this.$refs.proyectTypeAhead.inputValue = ''
         this.conexion = true
@@ -85,18 +78,15 @@ export default {
     },
     getProyectosPerQuery() {
       let newQuery = this.query
-      if (newQuery != "") {
-        axios.get(`${this.$store.getters.getDireccion}/proyectos?pagina=${this.currentPage}&nombre=${newQuery}`).then((res) => {
+      if (newQuery != '') {
+        this.$http.get(`${this.$store.getters.getDireccion}/proyectos?pagina=${this.currentPage}&nombre=${newQuery}`).then((res) => {
           this.proyectos = res.data.proyectos
-          this.pagina = res.data.pagina
-          this.rows = this.pagina.total_elementos
-          this.rowsPerPage = 10
-        }).catch((e) => {
+          this.rows = res.data.pagina.total_elementos
+        }).catch(() => {
           this.proyectos = []
           this.query = ''
           this.$refs.proyectTypeAhead.inputValue = ''
           this.$refs.btnAgregarProyecto.focus()
-          console.log(e)
         })
       } else {
         this.getProyectos()

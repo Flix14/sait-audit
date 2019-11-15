@@ -1,11 +1,20 @@
 <template>
   <b-modal id="modalFechaPersonalizada" centered title="Rango de fechas">
-    <b-input-group prepend="De:" class="mb-2 mr-sm-2 mb-sm-0">
-      <b-input v-model="fechaInicio" placeholder="Fecha de inicio" @focus="changeSelectedInputText(fechaInicio, 'inicio')" autofocus readonly style="background: #fff"></b-input>
+    <b-input-group prepend="De:">
+      <b-input 
+        v-model="fechaInicio" 
+        @focus="changeSelectedInputText(fechaInicio, 'inicio')" 
+        autofocus 
+        readonly>
+      </b-input>
     </b-input-group>
     <br>
-    <b-input-group prepend="Hasta:" class="mb-2 mr-sm-2 mb-sm-0">
-      <b-input ref="inputHasta" v-model="fechaFin" placeholder="Fecha final" @focus="changeSelectedInputText(fechaFin, 'fin')" readonly style="background: #fff"></b-input>
+    <b-input-group prepend="Hasta:">
+      <b-input 
+        v-model="fechaFin" 
+        @focus="changeSelectedInputText(fechaFin, 'fin')" 
+        readonly>
+      </b-input>
     </b-input-group>
     <br>
     <date-pick
@@ -31,15 +40,15 @@ export default {
   components: {DatePick},
   data() {
     return {
-      fecha: null,
-      fechaInicio: null,
-      fechaFin: null,
+      fecha: '',
+      fechaInicio: '',
+      fechaFin: '',
       selectedInput: 'inicio'
     }
   },
   methods: {
     closeModal() {
-      this.$bvModal.hide("modalFechaPersonalizada")
+      this.$bvModal.hide('modalFechaPersonalizada')
     },
     sendFecha() {
       if(parseInt(this.fechaInicio.replace(/-/g, '')) > parseInt(this.fechaFin.replace(/-/g, ''))) {
@@ -73,3 +82,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+[readonly] {
+  background-color: white;
+}
+</style>

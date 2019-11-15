@@ -1,5 +1,5 @@
 <template>
-  <div class="googleAuth">
+  <div>
     <NavBar @newLoggin="getUsuario"/>
     <br>
     <b-col class="text-center center">
@@ -9,11 +9,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import NavBar from '@/components/NavBar.vue'
 
 export default {
-  name: 'googleAuth',
   components: {
     NavBar
   },
@@ -24,11 +22,11 @@ export default {
     }
   },
   methods: {
-    //Se puede mejorar con Vuex
+    //Se puede mejorar con Vuex?
     getUsuario(usuario){
       let email = usuario.data.w3.U3
       this.isAuth = usuario.isAuth
-      axios.get(`${this.$store.getters.getDireccion}/usuarios?pagina=1&email=${email}`).then((res) => {
+      this.$http.get(`${this.$store.getters.getDireccion}/usuarios?pagina=1&email=${email}`).then((res) => {
           this.usuarioDB = res.data.usuarios
         }).catch(() => {
           this.handleClickSignOut()
@@ -51,7 +49,7 @@ export default {
         this.$router.push({name: 'home'})
       } else{
         this.handleClickSignOut()
-        alert("No tiene autorización para entrar al sistema")
+        alert('No tiene autorización para entrar al sistema')
       }
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="nuevaAuditoria ">
+  <div>
     <NavBar/>
     <br>
     <div class="text-center">
@@ -8,37 +8,44 @@
     <br>
     <b-form inline class="text-center">
       <b-col>
-        <h4 class="mr-sm-10" for="inline-form-custom-select-pref">Usuario</h4>
-        <b-form-input v-model="emailUsuario" type="text" style="background-color: #FFFFFF" disabled></b-form-input>
+        <h4>Usuario</h4>
+        <b-form-input v-model="emailUsuario" type="text" disabled />
       </b-col>
       <b-col>
-        <h4 class="mr-sm-10" for="inline-form-custom-select-pref">Proyecto*</h4>
+        <h4>Proyecto*</h4>
         <b-form-select 
-          ref="selectProyecto"
           v-model="selectedProyecto" 
           :options="proyectos"
           :state="changeStateInputProyecto">
         </b-form-select>
       </b-col>
       <b-col>
-        <h4 class="mr-sm-10" for="inline-form-custom-select-pref">IP Servidor*</h4>
+        <h4>IP Servidor*</h4>
         <b-form-select 
           v-model="selectedServidor" 
           :options="servidores" 
-          :disabled="selectedProyecto == 'Selecciona un proyecto' ? true : false"
+          :disabled="selectedProyecto == 'Selecciona un proyecto'"
           :state="changeStateInputServidor">
         </b-form-select>
       </b-col>
     </b-form>
     <br>
     <div class="container">
-      <h4 class="mr-sm-10" for="inline-form-custom-select-pref">Motivo*:</h4>
+      <h4>Motivo*:</h4>
       <b-form inline>
-        <b-form-select v-model="selectedMotivo" :options="motivos" :state="changeStateInputMotivo"></b-form-select>
-        <b-col v-if="selectedMotivo == 'Otro ' ? true : false">
+        <b-form-select 
+          v-model="selectedMotivo" 
+          :options="motivos" 
+          :state="changeStateInputMotivo">
+        </b-form-select>
+        <b-col v-if="selectedMotivo == 'Otro '">
           <b-form inline>
-            <h6 class="mr-sm-10" for="inline-form-custom-select-pref" style="margin-right:10px">Especifica*:</h6>
-            <b-form-input v-model="otroMotivo" type="text" :state="changeStateInputMotivoOtro"></b-form-input>
+            <h6>Especifica*:</h6>
+            <b-form-input 
+              v-model="otroMotivo" 
+              type="text" 
+              :state="changeStateInputMotivoOtro">
+            </b-form-input>
           </b-form>
         </b-col>
       </b-form>
@@ -58,8 +65,8 @@
       </b-form-textarea>
       <br>
       <div class="text-center">
-        <button class="btn btn-outline-danger badge-pill" @click="$router.go(-1)" style="width:100px; margin-right:5px">Cancelar</button>
-        <button class="btn btn-outline-success badge-pill" @click="guardarAuditoria()" style="width:100px; margin-left:5px">Guardar</button>
+        <button class="btn btn-outline-danger badge-pill" @click="$router.go(-1)">Cancelar</button>
+        <button class="btn btn-outline-success badge-pill" @click="guardarAuditoria()">Guardar</button>
       </div>
       <br>
     </div>
@@ -67,7 +74,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import NavBar from '@/components/NavBar.vue'
 
 export default {
@@ -92,7 +98,7 @@ export default {
   methods: {
     getProyectos(){
       var listaProyectos = []
-      axios.get(`${this.$store.getters.getDireccion}/proyectos`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/proyectos`).then(response => {
         listaProyectos = response.data.proyectos
         listaProyectos.forEach(proyecto => {
         this.proyectos.push({value: proyecto.id, text: proyecto.nombre})
@@ -104,7 +110,7 @@ export default {
     },
     getServidores(){
       var listaServidores = []
-      axios.get(`${this.$store.getters.getDireccion}/proyectos/${this.selectedProyecto}/servidores`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/proyectos/${this.selectedProyecto}/servidores`).then(response => {
         listaServidores = response.data
         listaServidores.forEach(servidor => {
         this.servidores.push({value: servidor.id, text: servidor.direccion_publica})
@@ -116,7 +122,7 @@ export default {
     },
     guardarAuditoria() {
       if(this.changeStateInputProyecto && this.changeStateInputServidor && this.changeStateInputMotivo && this.changeStateInputMotivoOtro && this.changeStateInputComandos) {
-        axios.post(`${this.$store.getters.getDireccion}/auditorias`, {
+        this.$http.post(`${this.$store.getters.getDireccion}/auditorias`, {
         motivo: this.selectedMotivo + this.otroMotivo,
         comentario: this.comentario,
         comandos: this.comandos,
@@ -168,3 +174,19 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+[disabled] {
+  background-color: white;
+}
+
+h6 {
+  margin-right: 10px
+}
+
+button {
+  width: 100px; 
+  margin-left: 5px;
+  margin-right: 5px;
+}
+</style>

@@ -1,9 +1,9 @@
 <template>
   <b-modal id="modalVerProyectosDeServidores" centered title="Proyectos">
-    <table id="tablaProyectosDeServidores" class="table table-hover table-bordered">
+    <table v-if="proyectos.length > 0" class="table table-hover table-bordered">
       <thead>
         <tr>
-          <th scope="col">Nombre</th>
+          <th>Nombre</th>
         </tr>
       </thead>
       <tbody>
@@ -14,7 +14,7 @@
     </table>
     <div class="container text-center" v-if="proyectos.length == 0">
       <p v-if="!conexion">No hay conexión con el servidor</p>
-      <p v-else>No hay datos en la tabla</p>
+      <p v-else>No hay proyectos asociados al servidor</p>
     </div>
     <template v-slot:modal-footer="{ Cerrar }">
       <b-button size="sm" variant="danger" @click="closeModal()">
@@ -25,8 +25,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   props: {
     idServidor: Number
@@ -46,12 +44,12 @@ export default {
     idServidor: function (val) {
       var listaProyectos = []
       this.proyectos = []
-      axios.get(`${this.$store.getters.getDireccion}/servidores/${val}/proyectos`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/servidores/${val}/proyectos`).then(response => {
         listaProyectos = response.data
         listaProyectos.forEach(proyecto => {
-        this.proyectos.push({id: proyecto.id, nombre: proyecto.nombre})
-        this.conexion = true
-      })
+          this.proyectos.push({id: proyecto.id, nombre: proyecto.nombre})
+          this.conexion = true
+        })
       }).catch(() => this.conexion = false)
     }
   }

@@ -1,26 +1,27 @@
 <template>
   <div class="container table-responsive">
-    <table id="tablaProyectos" class="table table-dark table-hover table-bordered">
+    <table class="table table-dark table-hover table-bordered">
       <thead>
         <tr>
-          <th scope="col">Nombre</th>
-          <th class="text-right">Acción</th>
+          <th>Nombre</th>
+          <th class="text-center">Servidores</th>
+          <th class="text-center">Acción</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="proyecto in proyectos" :key="proyecto.id">
           <td>{{proyecto.nombre}}</td>
-          <td class="text-right">
+          <td class="text-center">
             <b-button 
-              variant="btn btn-outline-success badge-pill" 
-              style="width:120px;"
-              @click="proyectoSeleccionado = proyecto; $bvModal.show('modalVerServidoresDeProyectos')">
+              variant="btn btn-outline-success badge-pill"
+              @click="openModalVer(proyecto)">
               Ver servidores
             </b-button>
+          </td>
+          <td class="text-center">
             <b-button  
-              variant="btn btn-outline-info badge-pill" 
-              style="width:90px; margin: 5px;" 
-              @click="proyectoSeleccionado = proyecto; $bvModal.show('modalEditarProyecto')">
+              variant="btn btn-outline-info badge-pill"  
+              @click="openModalEditar(proyecto)">
               Editar
             </b-button>
           </td>
@@ -42,7 +43,7 @@ export default {
     ModalVerServidoresDeProyectos
   },
   props: {
-    proyectos: null
+    proyectos: Array
   },
   data() {
     return {
@@ -51,10 +52,18 @@ export default {
   },
   methods: {
     updateListProyectos(newProyecto) {
-      var oldProyecto = this.proyectos.find(element => {
-          return element.id == newProyecto.id
+      var oldProyecto = this.proyectos.find(proyecto => {
+          return proyecto.id == newProyecto.id
         })
       oldProyecto.nombre = newProyecto.nombre
+    },
+    openModalEditar(proyecto) {
+      this.proyectoSeleccionado = proyecto 
+      this.$bvModal.show('modalEditarProyecto')
+    },
+    openModalVer(proyecto) {
+      this.proyectoSeleccionado = proyecto 
+      this.$bvModal.show('modalVerServidoresDeProyectos')
     }
   }
 }

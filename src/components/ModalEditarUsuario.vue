@@ -1,8 +1,8 @@
 <template>
   <b-modal id="modalEditarUsuario" title="Editar Usuario" centered @shown="getUsuario()">
     <h6>Correo electrónico</h6>
-    <b-input-group prepend="@" class="mb-2 mr-sm-2 mb-sm-0">
-      <b-input ref="email" placeholder="Correo Electrónico" v-model="email" :state="changeStateInputEmail"></b-input>
+    <b-input-group prepend="@">
+      <b-input v-model="email" :state="changeStateInputEmail" />
     </b-input-group>
     <template v-slot:modal-footer="{ Cancelar, Guardar }">
       <b-button size="sm" variant="danger" @click="closeModal()">
@@ -16,8 +16,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   props: {
     idUsuario: Number
@@ -31,29 +29,29 @@ export default {
   },
   methods: {
     getUsuario() {
-      axios.get(`${this.$store.getters.getDireccion}/usuarios/${this.idUsuario}`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/usuarios/${this.idUsuario}`).then(response => {
         this.email = response.data.email
         this.estado = response.data.estado
       }).catch(() => {
         this.closeModal()
-        alert("No hay conexión con el servidor")
+        alert('No hay conexión con el servidor')
       })
     },
     closeModal() {
-      this.$bvModal.hide("modalEditarUsuario")
+      this.$bvModal.hide('modalEditarUsuario')
     },
     updateUsuario() {
       if(this.changeStateInputEmail) {
-        axios.put(`${this.$store.getters.getDireccion}/usuarios/${this.idUsuario}`, {
+        this.$http.put(`${this.$store.getters.getDireccion}/usuarios/${this.idUsuario}`, {
           email: this.email,
           estado: this.estado
         }).then(response => {
           var usuario = response.data
           this.$emit('usuarioUpdating', usuario)
           this.closeModal()
-        }).catch(() => alert("No hay conexión con el servidor"))
+        }).catch(() => alert('No hay conexión con el servidor'))
       } else {
-        alert("Favor de ingresar un email")
+        alert('Favor de ingresar un email')
       }
     }
   },

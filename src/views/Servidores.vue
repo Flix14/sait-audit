@@ -1,5 +1,5 @@
 <template>
-  <div class="servidores">
+  <div>
     <NavBar/>
     <br>
     <div class="text-center">
@@ -45,22 +45,19 @@
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
-      :per-page="rowsPerPage"
-      aria-controls="tablaServidores"
+      :per-page="10"
       align="center"
-      :hidden="rowsPerPage != 10 || servidores.length == 0"
+      :hidden="servidores.length == 0"
     ></b-pagination>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Tabla from '@/components/TablaServidores.vue'
 import ModalAgregarServidor from '@/components/ModalAgregarServidor.vue'
 import NavBar from '@/components/NavBar.vue'
 
 export default {
-  name: 'servidores',
   components: {
     Tabla,
     ModalAgregarServidor,
@@ -70,7 +67,6 @@ export default {
     return {
       servidores: [],
       dominios: [],
-      pagina: null,
       currentPage: 1,
       rows: 10,
       rowsPerPage: 10,
@@ -81,11 +77,9 @@ export default {
   },
   methods: {
     getServidores(){
-      axios.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}`).then(response => {
         this.servidores = response.data.servidores
-        this.pagina = response.data.pagina
-        this.rows = this.pagina.total_elementos
-        this.rowsPerPage = 10
+        this.rows = response.data.pagina.total_elementos
         this.query = ''
         this.$refs.servTypeAhead.inputValue = ''
         this.conexion = true
@@ -93,13 +87,11 @@ export default {
     },
     getServidoresPerQuery() {
       let newQuery = this.query
-      if (newQuery != "") {
-        if (this.tipoBusqueda == "Dirección pública") {
-          axios.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}&direccion_publica=${newQuery}`).then((res) => {
+      if (newQuery != '') {
+        if (this.tipoBusqueda == 'Dirección pública') {
+          this.$http.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}&direccion_publica=${newQuery}`).then((res) => {
             this.servidores = res.data.servidores
-            this.pagina = res.data.pagina
-            this.rows = this.pagina.total_elementos
-            this.rowsPerPage = 10
+            this.rows = res.data.pagina.total_elementos
           }).catch(() => {
             this.servidores = []
             this.query = ''
@@ -109,7 +101,7 @@ export default {
         } else {
           var listaServidores = []
           this.dominios = []
-          axios.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}&dominio=${newQuery}`).then((res) => {
+          this.$http.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}&dominio=${newQuery}`).then((res) => {
             listaServidores = res.data.servidores
             this.servidores = listaServidores
             listaServidores.forEach(servidor => {
@@ -117,9 +109,7 @@ export default {
                 this.dominios.push(dominio.dominio)
               })
             })
-            this.pagina = res.data.pagina
-            this.rows = this.pagina.total_elementos
-            this.rowsPerPage = 10
+            this.rows = res.data.pagina.total_elementos
           }).catch(() => {
             this.servidores = []
             this.query = ''
@@ -154,7 +144,3 @@ export default {
   }
 }
 </script>
-
-<style>
-select:focus{ outline: none;}
-</style>

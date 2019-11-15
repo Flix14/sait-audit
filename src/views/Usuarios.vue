@@ -1,5 +1,5 @@
 <template>
-  <div class="usuarios">
+  <div>
     <NavBar/>
     <br>
     <div class="text-center">
@@ -11,7 +11,7 @@
         <b-col>
           <vue-bootstrap-typeahead
           ref="usTypeAhead"
-          :class="usuarios.length == 0 && query == '' ? 'disabled' : ''"
+          :class="usuarios.length == 0 && query == '' ? 'disabled-type-ahead' : ''"
           v-model="query"
           :data="usuarios"
           :serializer="usuario => usuario.email"
@@ -48,22 +48,19 @@
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
-      :per-page="rowsPerPage"
-      aria-controls="tablaUsuarios"
+      :per-page="10"
       align="center"
-      :hidden="rowsPerPage != 10 || usuarios.length == 0"
+      :hidden="usuarios.length == 0"
     ></b-pagination>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Tabla from '@/components/TablaUsuarios.vue'
 import ModalAgregarUsuario from '@/components/ModalAgregarUsuario.vue'
 import NavBar from '@/components/NavBar.vue'
 
 export default {
-  name: 'usuarios',
   components: {
     Tabla,
     ModalAgregarUsuario,
@@ -72,7 +69,6 @@ export default {
   data() {
     return {
       usuarios: [],
-      pagina: null,
       currentPage: 1,
       rows: 10,
       rowsPerPage: 10,
@@ -89,11 +85,9 @@ export default {
       }else {
         selectQuery = `${this.$store.getters.getDireccion}/usuarios?pagina=${this.currentPage}&estado=${this.filtroEstadoSelected}`
       }
-      axios.get(selectQuery).then(response => {
+      this.$http.get(selectQuery).then(response => {
         this.usuarios = response.data.usuarios
-        this.pagina = response.data.pagina
-        this.rows = this.pagina.total_elementos
-        this.rowsPerPage = 10
+        this.rows = response.data.pagina.total_elementos
         this.$refs.usTypeAhead.inputValue = '' //Al hacer esto se invoca dos veces, sucede en todas las tablas !!ARREGLAR
         this.query = ''
         this.conexion = true
@@ -102,17 +96,15 @@ export default {
     getUsuariosPerQuery(){
       let newQuery = this.query
       let selectQuery
-      if (newQuery != "") {
+      if (newQuery != '') {
         if(this.filtroEstadoSelected == 'todos'){
           selectQuery = `${this.$store.getters.getDireccion}/usuarios?pagina=${this.currentPage}&email=${newQuery}`
         }else {
           selectQuery = `${this.$store.getters.getDireccion}/usuarios?pagina=${this.currentPage}&email=${newQuery}&estado=${this.filtroEstadoSelected}`
         }
-        axios.get(selectQuery).then((res) => {
+        this.$http.get(selectQuery).then((res) => {
           this.usuarios = res.data.usuarios
-          this.pagina = res.data.pagina
-          this.rows = this.pagina.total_elementos
-          this.rowsPerPage = 10
+          this.rows = res.data.pagina.total_elementos
         }).catch(() => {
             this.usuarios = []
             this.query = ''
@@ -153,11 +145,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.disabled {
-  pointer-events: none;
-  opacity: 0.4; 
-  outline: none;
-}
-</style>

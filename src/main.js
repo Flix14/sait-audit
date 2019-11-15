@@ -7,6 +7,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import GAuth from 'vue-google-oauth2'
+import axios from 'axios'
 
 const gauthOption = {
   clientId: '519162351103-6iavkb1ofor81uheqi7dnbo800qj7vvd.apps.googleusercontent.com',
@@ -14,6 +15,7 @@ const gauthOption = {
   prompt: 'select_account'
 }
 
+Vue.prototype.$http = axios
 Vue.use(BootstrapVue)
 Vue.component('vue-bootstrap-typeahead', VueBootstrapTypeahead)
 Vue.use(GAuth, gauthOption)

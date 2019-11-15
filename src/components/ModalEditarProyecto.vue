@@ -1,8 +1,8 @@
 <template>
   <b-modal id="modalEditarProyecto" title="Editar Proyecto" centered @shown="getProyecto()">
     <h6>Nombre</h6>
-    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-      <b-input ref="nombre" placeholder="Nombre" v-model="nombre" :state="changeStateInputNombre"></b-input>
+    <b-input-group>
+      <b-input v-model="nombre" :state="changeStateInputNombre" />
     </b-input-group>
     <template v-slot:modal-footer="{ Cancelar, Guardar }">
       <b-button size="sm" variant="danger" @click="closeModal()">
@@ -16,32 +16,30 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   props: {
     idProyecto: Number
   },
   data() {
     return {
-      nombre: ""
+      nombre: ''
     }
   },
   methods: {
     getProyecto() {
-      axios.get(`${this.$store.getters.getDireccion}/proyectos/${this.idProyecto}`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/proyectos/${this.idProyecto}`).then(response => {
         this.nombre = response.data.nombre
       }).catch(() => {
         this.closeModal()
-        alert("No hay conexión con el servidor")
+        alert('No hay conexión con el servidor')
       })
     },
     closeModal() {
-      this.$bvModal.hide("modalEditarProyecto")
+      this.$bvModal.hide('modalEditarProyecto')
     },
     updateProyecto() {
       if(this.changeStateInputNombre) {
-        axios.put(`${this.$store.getters.getDireccion}/proyectos/${this.idProyecto}`, {
+        this.$http.put(`${this.$store.getters.getDireccion}/proyectos/${this.idProyecto}`, {
         nombre: this.nombre
       }).then(response => {
         var proyecto = response.data
@@ -49,10 +47,10 @@ export default {
         this.closeModal()
       }).catch(() => {
         this.closeModal()
-        alert("No hay conexión con el servidor")
+        alert('No hay conexión con el servidor')
       })
       } else {
-        alert("Favor de ingresar un nombre")
+        alert('Favor de ingresar un nombre')
       }
     }
   },

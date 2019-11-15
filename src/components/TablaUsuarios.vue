@@ -1,29 +1,27 @@
 <template>
   <div class="container table-responsive">
-    <table id="tablaUsuarios" class="table table-dark table-hover table-bordered">
+    <table class="table table-dark table-hover table-bordered">
       <thead>
         <tr> 
-          <th scope="col">Correo Electronico</th> 
-          <th scope="col">Estado</th> 
-          <th class="text-right">Acción</th>
+          <th>Correo Electronico</th> 
+          <th>Estado</th> 
+          <th class="text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="usuario in usuarios" :key="usuario.id"> 
           <td>{{usuario.email}}</td>
-          <td>{{usuario.estado == 1 ? "Activo" : "Inactivo"}}</td>
-          <td class="text-right">
+          <td>{{usuario.estado == 1 ? 'Activo' : 'Inactivo'}}</td>
+          <td class="text-center">
             <button 
-              class="btn btn-outline-info badge-pill" 
-              style="width:90px; margin: 5px;" 
-              @click="usuarioSeleccionado = usuario; $bvModal.show('modalEditarUsuario')">
+              class="btn btn-outline-info badge-pill"  
+              @click="openModalEditar(usuario)">
               Editar
             </button>
             <button 
-              class="btn btn-outline-danger badge-pill" 
-              style="width:90px;" 
+              :class="usuario.estado == 1 ? 'btn btn-outline-danger badge-pill' : 'btn btn-outline-success badge-pill'"
               @click="changeStatus(usuario.id, usuario.email, usuario.estado)">
-              {{usuario.estado == 1 ? "Desactivar" : "Activar"}}
+              {{usuario.estado == 1 ? 'Desactivar' : 'Activar'}}
             </button>
           </td>
         </tr>
@@ -34,7 +32,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import ModalEditarUsuario from '@/components/ModalEditarUsuario.vue'
 
 export default {
@@ -42,7 +39,7 @@ export default {
     ModalEditarUsuario
   },
   props: {
-    usuarios: null
+    usuarios: Array
   },
   data() {
     return {
@@ -51,7 +48,7 @@ export default {
   },
   methods: {
     changeStatus(id, email, estado){
-      axios.put(`${this.$store.getters.getDireccion}/usuarios/${id}`, {
+      this.$http.put(`${this.$store.getters.getDireccion}/usuarios/${id}`, {
         email: email,
         estado: estado == 1 ? 0 : 1
       }).then(response => {
@@ -60,14 +57,30 @@ export default {
         })
         usuario.estado = response.data.estado
         this.$emit('estadoUpdating')
-      }).catch(() => alert("No hay conexión con la base de datos"))
+      }).catch(() => alert('No hay conexión con la base de datos'))
     },
     updateListUsuarios(newUsuario) {
       var oldUsuario = this.usuarios.find(element => {
           return element.id == newUsuario.id
         })
       oldUsuario.email = newUsuario.email
+    },
+    openModalEditar(usuario) {
+      this.usuarioSeleccionado = usuario 
+      this.$bvModal.show('modalEditarUsuario')
     }
   }
 }
 </script>
+
+<style scoped>
+.btn-outline-success {
+  width:90px; 
+  margin-left: 10px;
+}
+
+.btn-outline-danger {
+  width:90px; 
+  margin-left: 10px;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="auditorias">
+  <div>
     <NavBar/>
     <br>
     <div class="text-center">
@@ -7,14 +7,14 @@
     </div>
     <br>
     <b-container>
-      <b-row >
+      <b-row>
         <b-col>
           <vue-bootstrap-typeahead
             ref="auditTypeAhead"
             :class="auditorias.length == 0 && query == '' ? 'disabled' : ''"
             v-model="query"
             :data="auditorias"
-            :serializer="auditoria => changeSerializer(auditoria)"
+            :serializer="auditoria => ''"
             placeholder="Buscar auditorias"
           >
             <template v-slot:prepend>
@@ -33,7 +33,7 @@
             <b-dropdown-item @click="filtrarFechaAyer">Ayer</b-dropdown-item>
             <b-dropdown-item @click="filtrarFechaSemana">Esta semana</b-dropdown-item>
             <b-dropdown-item @click="filtrarFechaMes">Este mes</b-dropdown-item>
-            <b-dropdown-divider></b-dropdown-divider>
+            <b-dropdown-divider/>
             <b-dropdown-item v-b-modal.modalFechaPersonalizada>Fecha personalizada</b-dropdown-item>
           </b-dropdown>
         </b-col>
@@ -49,7 +49,6 @@
     </b-container>
     <br>
     <Tabla :auditorias="auditorias"/>
-    <ModalFechaPersonalizada @sendingFechas="filtrarFechaPersonalizada" />
     <div class="container text-center" v-if="auditorias.length == 0">
       <p v-if="!conexion">No hay conexión con el servidor</p>
       <p v-else>No hay datos en la tabla</p>
@@ -57,16 +56,15 @@
     <b-pagination
       v-model="currentPage"
       :total-rows="rows"
-      :per-page="rowsPerPage"
-      aria-controls="tablaAuditorias"
+      :per-page="10"
       align="center"
-      :hidden="rowsPerPage != 10 || auditorias.length == 0"
-    ></b-pagination>
+      :hidden="auditorias.length == 0">
+    </b-pagination>
+    <ModalFechaPersonalizada @sendingFechas="filtrarFechaPersonalizada" />
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Tabla from '@/components/TablaAuditorias.vue'
 import ModalFechaPersonalizada from '@/components/ModalFechaPersonalizada.vue'
 import NavBar from '@/components/NavBar.vue'
@@ -81,43 +79,24 @@ export default {
   data() {
     return {
       auditorias: [],
-      pagina: null,
       currentPage: 1,
       rows: 10,
-      rowsPerPage: 10,
-      query: "",
-      tipoBusqueda: "Motivo",
+      query: '',
+      tipoBusqueda: 'Motivo',
       filtroFecha: 'De cualquier fecha',
-      limitInf: "0000-00-00T00:00:00",
-      limitSup: "",
+      limitInf: '0000-00-00T00:00:00',
+      limitSup: '',
       conexion: true
     }
   },
   methods: {
     getAuditorias(){
-      axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}`)
+      this.$http.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}`)
       .then(response => {
         this.auditorias = response.data.auditorias
-        this.pagina = response.data.pagina
-        this.rows = this.pagina.total_elementos
-        this.rowsPerPage = 10
+        this.rows = response.data.pagina.total_elementos
         this.conexion = true
       }).catch(() => this.conexion = false)
-    },
-    changeSerializer(/*auditoria*/){ //Arreglar
-      if(this.tipoBusqueda == 'Motivo') {
-        //return auditoria.motivo 
-      }
-      if(this.tipoBusqueda == 'Proyecto') {
-        //return auditoria.nombre_proyecto
-      }
-      if(this.tipoBusqueda == 'IP Servidor') {
-        //return auditoria.ip_servidor
-      }
-      if(this.tipoBusqueda == 'Usuario') {
-        //return auditoria.usuario
-      }
-      return ''
     },
     getFechaYHora(){
       let fecha = new Date()
@@ -160,13 +139,12 @@ export default {
     },
     setFilters() {
       var newQuery = this.query //Arreglar esto 
-      if (newQuery != "") {
-        if (this.tipoBusqueda == "Motivo") {
-          axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&motivo=${newQuery}`)
+      if (newQuery != '') {
+        if (this.tipoBusqueda == 'Motivo') {
+          this.$http.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&motivo=${newQuery}`)
           .then((res) => {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
-            this.rowsPerPage = 10 //Cambiar todo esto, es innecesaria esta variable
           }).catch(() => {
             this.auditorias = []
             this.query = ''
@@ -174,12 +152,11 @@ export default {
             this.$refs.btnNuevaAuditoria.focus()
           })
         }
-        if (this.tipoBusqueda == "Proyecto") {
-          axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&nombre_proyecto=${newQuery}`)
+        if (this.tipoBusqueda == 'Proyecto') {
+          this.$http.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&nombre_proyecto=${newQuery}`)
           .then((res) => {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
-            this.rowsPerPage = 10
           }).catch(() => {
             this.auditorias = []
             this.query = ''
@@ -187,12 +164,11 @@ export default {
             this.$refs.btnNuevaAuditoria.focus()
           }) 
         }
-        if (this.tipoBusqueda == "IP Servidor") {
-          axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&ip_servidor=${newQuery}`)
+        if (this.tipoBusqueda == 'IP Servidor') {
+          this.$http.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&ip_servidor=${newQuery}`)
           .then((res) => {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
-            this.rowsPerPage = 10
           }).catch(() => {
             this.auditorias = []
             this.query = ''
@@ -200,12 +176,11 @@ export default {
             this.$refs.btnNuevaAuditoria.focus()
           })
         }
-        if (this.tipoBusqueda == "Usuario") {
-          axios.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&usuario=${newQuery}`)
+        if (this.tipoBusqueda == 'Usuario') {
+          this.$http.get(`${this.$store.getters.getDireccion}/auditorias?pagina=${this.currentPage}&limit_inf=${this.limitInf}&limit_sup=${this.limitSup}&usuario=${newQuery}`)
           .then((res) => {
             this.auditorias = res.data.auditorias
             this.rows = res.data.pagina.total_elementos
-            this.rowsPerPage = 10
           }).catch(() => {
             this.auditorias = []
             this.query = ''

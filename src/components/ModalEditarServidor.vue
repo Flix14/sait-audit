@@ -1,8 +1,8 @@
 <template>
   <b-modal id="modalEditarServidor" title="Editar Servidor" centered @shown="getServidor()">
     <h6>Sistema operativo</h6>
-    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-      <b-input ref="sistemaOperativo" placeholder="Sistema operativo" v-model="sistemaOperativo" :state="changeStateInput"></b-input>
+    <b-input-group>
+      <b-input v-model="sistemaOperativo" :state="changeStateInput"></b-input>
     </b-input-group>
     <template v-slot:modal-footer="{ Cancelar, Guardar }">
       <b-button size="sm" variant="danger" @click="closeModal()">
@@ -16,36 +16,34 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   props: {
     idServidor: Number
   },
   data() {
     return {
-      sistemaOperativo: "",
-      direccion: null,
-      dominio: null
+      sistemaOperativo: '',
+      direccion: '',
+      dominio: ''
     }
   },
   methods: {
     getServidor() {
-      axios.get(`${this.$store.getters.getDireccion}/servidores/${this.idServidor}`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/servidores/${this.idServidor}`).then(response => {
         this.sistemaOperativo = response.data.sistema_operativo
         this.direccion = response.data.direccion_publica
         this.dominio = response.data.dominio
       }).catch(() => {
         this.closeModal()
-        alert("No hay conexión con el servidor")
+        alert('No hay conexión con el servidor')
       })
     },
     closeModal() {
-      this.$bvModal.hide("modalEditarServidor")
+      this.$bvModal.hide('modalEditarServidor')
     },
     updateServidor() {
       if(this.changeStateInput) {
-        axios.put(`${this.$store.getters.getDireccion}/servidores/${this.idServidor}`, {
+        this.$http.put(`${this.$store.getters.getDireccion}/servidores/${this.idServidor}`, {
         sistema_operativo: this.sistemaOperativo,
         direccion_publica: this.direccion,
         dominio: this.dominio
@@ -55,10 +53,10 @@ export default {
         this.closeModal()
       }).catch(() => {
         this.closeModal()
-        alert("No hay conexión con el servidor")
+        alert('No hay conexión con el servidor')
       })
       } else {
-        alert("Ingresar un sistema operativo")
+        alert('Ingresar un sistema operativo')
       }
     }
   },

@@ -1,28 +1,39 @@
 <template>
   <b-modal id="modalAgregarProyecto" title="Ingresar nuevo proyecto" centered @hidden="cleanModal()" @shown="getServidores">
     <h6>Nombre</h6>
-    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-      <b-input placeholder="Nombre" v-model="nombre" :state="changeStateInputNombre"></b-input>
+    <b-input-group>
+      <b-input placeholder="ej. SAIT 123" v-model="nombre" :state="changeStateInputNombre" />
     </b-input-group>
     <br>
     <b-row>
       <b-col>
-        <h6 ref="serv">Servidores</h6>
+        <h6>Servidores</h6>
       </b-col>
       <b-col class="text-right">
-        <b-button variant="outline-danger" size="sm" @click="totalNuevosServidores--; servidoresSelected.pop()" v-if="totalNuevosServidores" style="width: 30px">-</b-button>
-        <b-button variant="outline-primary" size="sm" @click="totalNuevosServidores++; servidoresSelected.push('')" style="margin-left: 5px; width: 30px">+</b-button>
+        <b-button 
+          variant="outline-danger" 
+          size="sm" 
+          @click="removeLastInputServidor()" 
+          v-if="totalNuevosServidores">
+          -
+        </b-button>
+        <b-button 
+          variant="outline-primary" 
+          size="sm" 
+          @click="addNewInputServidor()">
+          +
+        </b-button>
       </b-col>
     </b-row>
-    <div ref="divServidores" v-if="!totalNuevosServidores">
+    <div v-if="!totalNuevosServidores">
       <p>Agregue servidores para el proyecto</p>
     </div>
     <div v-else>
       <div v-for="servidor in totalNuevosServidores" :key="servidor">
-        <b-form-select 
+        <b-form-select
+          class="select-servers"
           v-model="servidoresSelected[servidor - 1]" 
           :options="servidoresExistentes" 
-          style="margin-top: 5px" 
           :state="servidoresSelected[servidor - 1] != ''">
         </b-form-select>
       </div>
@@ -39,8 +50,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   data() {
     return {
@@ -52,24 +61,24 @@ export default {
   },
   methods: {
     cleanModal(){
-      this.nombre = ""
+      this.nombre = ''
       this.totalNuevosServidores = 0
       this.servidoresSelected = []
     },
     closeModal() {
-      this.$bvModal.hide("modalAgregarProyecto")
+      this.$bvModal.hide('modalAgregarProyecto')
     },
     getServidores() {
       var listaServidores = []
       this.servidoresExistentes = []
-      axios.get(`${this.$store.getters.getDireccion}/servidores`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/servidores`).then(response => {
         listaServidores = response.data.servidores
         listaServidores.forEach(servidor => {
         this.servidoresExistentes.push({value: servidor.id, text: servidor.direccion_publica})
       })
       }).catch(() => {
         this.closeModal()
-        alert("No hay conexión con el servidor")
+        alert('No hay conexión con el servidor')
       })
     },
     addProyecto() {
@@ -82,7 +91,7 @@ export default {
           }
         })
         if(!servidorVacio) {
-          axios.post(`${this.$store.getters.getDireccion}/proyectos`, {
+          this.$http.post(`${this.$store.getters.getDireccion}/proyectos`, {
             nombre: this.nombre,
             servidores: this.servidoresSelected
           }).then(() => {
@@ -90,14 +99,22 @@ export default {
             this.closeModal()
           }).catch(() => {
             this.closeModal()
-            alert("No hay conexión con el servidor")
+            alert('No hay conexión con el servidor')
           })
         } else {
-          alert("Ingrese servidores")
+          alert('Ingrese servidores')
         }
       } else {
-        alert("Ingrese todos los campos necesarios")
+        alert('Ingrese todos los campos necesarios')
       }
+    },
+    addNewInputServidor() {
+      this.totalNuevosServidores++
+      this.servidoresSelected.push('')
+    },
+    removeLastInputServidor() {
+      this.totalNuevosServidores--
+      this.servidoresSelected.pop()
     }
   },
   computed: {
@@ -112,5 +129,13 @@ export default {
 p {
   font-weight: bold;
   color: tomato;
+}
+.text-right > button {
+  margin-left: 5px; 
+  width: 30px
+}
+
+.select-servers {
+  margin-top: 5px;
 }
 </style>
