@@ -1,5 +1,10 @@
 <template>
-  <b-modal id="modalVerProyectosDeServidores" centered title="Proyectos">
+  <b-modal 
+  id="modalVerProyectosDeServidores" 
+  centered title="Proyectos" 
+  no-close-on-esc 
+  no-close-on-backdrop 
+  hide-header-close>
     <table v-if="proyectos.length > 0" class="table table-hover table-bordered">
       <thead>
         <tr>

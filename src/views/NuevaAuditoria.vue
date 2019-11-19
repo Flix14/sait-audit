@@ -70,6 +70,14 @@
       </div>
       <br>
     </div>
+    <b-alert 
+      class="position-fixed fixed-top m-0 rounded-0"
+      style="z-index: 2000;"
+      variant="danger" 
+      v-model="showWarning" 
+      dismissible>
+      Ingrese todos los campos marcados para guardar la auditoría
+    </b-alert>
   </div>
 </template>
 
@@ -92,7 +100,8 @@ export default {
       selectedServidor: 'Selecciona un servidor',
       selectedProyecto: 'Selecciona un proyecto',
       selectedMotivo: 'Selecciona un motivo',
-      otroMotivo: ''
+      otroMotivo: '',
+      showWarning: false
     }
   },
   methods: {
@@ -104,8 +113,17 @@ export default {
         this.proyectos.push({value: proyecto.id, text: proyecto.nombre})
       })
       }).catch(() => {
-        alert("No hay conexión con el servidor")
-        this.$router.push({name: 'home'})
+        this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+          title: 'Problemas de conexión',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        }).then(() => {
+          this.$router.push({name: 'home'})
+        })
       })
     },
     getServidores(){
@@ -116,11 +134,21 @@ export default {
         this.servidores.push({value: servidor.id, text: servidor.direccion_publica})
       })
       }).catch(() => {
-        alert("No hay conexión con el servidor")
-        this.$router.push({name: 'home'})
+        this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+          title: 'Problemas de conexión',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        }).then(() => {
+          this.$router.push({name: 'home'})
+        })
       })
     },
     guardarAuditoria() {
+      this.showWarning = false
       if(this.changeStateInputProyecto && this.changeStateInputServidor && this.changeStateInputMotivo && this.changeStateInputMotivoOtro && this.changeStateInputComandos) {
         this.$http.post(`${this.$store.getters.getDireccion}/auditorias`, {
         motivo: this.selectedMotivo + this.otroMotivo,
@@ -130,14 +158,32 @@ export default {
         id_proyecto: this.selectedProyecto,
         id_servidor: this.selectedServidor
       }).then(response => {
-        //Enviar mensaje o hacer algo con esto
-        alert(`La auditoría #${response.data.id} ha sido guardada`)
-        this.$router.push({name: 'home'})
+        this.$bvModal.msgBoxOk(`Auditoría #${response.data.id} guardada correctamente`, {
+            title: 'Aviso',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'success',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
+            centered: true
+          }).then(res => {
+            if(res) {
+              this.$router.push({name: 'home'})
+            }
+          })
       }).catch(() => {
-        alert("No hay conexión con el servidor")
+        this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+          title: 'Problemas de conexión',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        })
       })
       } else {
-        alert("Favor de llenar los campos marcados")
+        this.showWarning = true
       }
     }
   },

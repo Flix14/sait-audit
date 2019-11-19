@@ -1,9 +1,18 @@
 <template>
-  <b-modal id="modalAgregarProyecto" title="Ingresar nuevo proyecto" centered @hidden="cleanModal()" @shown="getServidores">
+  <b-modal 
+    id="modalAgregarProyecto" 
+    title="Ingresar nuevo proyecto" 
+    centered 
+    @hidden="cleanModal()" 
+    @shown="getServidores" 
+    no-close-on-esc 
+    no-close-on-backdrop 
+    hide-header-close>
     <h6>Nombre</h6>
     <b-input-group>
-      <b-input placeholder="ej. SAIT 123" v-model="nombre" :state="changeStateInputNombre" />
+      <b-input placeholder="ej. SAIT 123" v-model="nombre" :state="changeStateInputNombre" autofocus/>
     </b-input-group>
+    <p v-if="showWarningNombre">*Debe ingresar un nombre para el proyecto</p>
     <br>
     <b-row>
       <b-col>
@@ -26,7 +35,7 @@
       </b-col>
     </b-row>
     <div v-if="!totalNuevosServidores">
-      <p>Agregue servidores para el proyecto</p>
+      <p v-if="showWarningServidores">*Agregue servidores para el proyecto</p>
     </div>
     <div v-else>
       <div v-for="servidor in totalNuevosServidores" :key="servidor">
@@ -36,6 +45,7 @@
           :options="servidoresExistentes" 
           :state="servidoresSelected[servidor - 1] != ''">
         </b-form-select>
+        <p v-if="showWarningServidores && servidoresSelected[servidor - 1] == ''">*Elija un servidor</p>
       </div>
     </div>
     <template v-slot:modal-footer="{ Cancelar, Agregar }">
@@ -56,7 +66,9 @@ export default {
       nombre: '',
       totalNuevosServidores: 0,
       servidoresExistentes: [],
-      servidoresSelected: []
+      servidoresSelected: [],
+      showWarningNombre: false,
+      showWarningServidores: false
     }
   },
   methods: {
@@ -64,6 +76,8 @@ export default {
       this.nombre = ''
       this.totalNuevosServidores = 0
       this.servidoresSelected = []
+      this.showWarningNombre = false
+      this.showWarningServidores = false
     },
     closeModal() {
       this.$bvModal.hide('modalAgregarProyecto')
@@ -77,12 +91,24 @@ export default {
         this.servidoresExistentes.push({value: servidor.id, text: servidor.direccion_publica})
       })
       }).catch(() => {
-        this.closeModal()
-        alert('No hay conexión con el servidor')
+        this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+          title: 'Problemas de conexión',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        }).then(res => {
+          if(res) {
+            this.closeModal()
+          }
+        })
       })
     },
     addProyecto() {
       var servidorVacio = false
+      this.showWarningNombre = false
       if(this.changeStateInputNombre && this.totalNuevosServidores > 0 && this.servidoresSelected.length > 0) {
         this.servidoresSelected.forEach(servidor => {
           if(servidor == '') {
@@ -97,24 +123,53 @@ export default {
           }).then(() => {
             this.$emit('proyectoAdding')
             this.closeModal()
-          }).catch(() => {
-            this.closeModal()
-            alert('No hay conexión con el servidor')
+          }).catch((e) => {
+            if(e.response != undefined){
+              if(e.response.status == 409) {
+                this.$bvModal.msgBoxOk('Ya existe un proyecto con ese nombre', {
+                  title: 'Proyecto existente',
+                  size: 'sm',
+                  buttonSize: 'sm',
+                  okVariant: 'success',
+                  headerClass: 'p-2 border-bottom-0',
+                  footerClass: 'p-2 border-top-0',
+                  centered: true
+                })
+              }
+            } else if(e.message == 'Network Error'){
+              this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+                title: 'Problemas de conexión',
+                size: 'sm',
+                buttonSize: 'sm',
+                okVariant: 'success',
+                headerClass: 'p-2 border-bottom-0',
+                footerClass: 'p-2 border-top-0',
+                centered: true
+              })
+            } else {
+              this.$bvModal.msgBoxOk('Ha ocurrido un error inesperado')
+            }
           })
         } else {
-          alert('Ingrese servidores')
+          this.showWarningServidores = true
         }
       } else {
-        alert('Ingrese todos los campos necesarios')
+        if(this.nombre.length == 0) {
+          this.showWarningNombre = true
+        } else {
+          this.showWarningServidores = true
+        }
       }
     },
     addNewInputServidor() {
       this.totalNuevosServidores++
       this.servidoresSelected.push('')
+      this.showWarningServidores = false
     },
     removeLastInputServidor() {
       this.totalNuevosServidores--
       this.servidoresSelected.pop()
+      this.showWarningServidores = false
     }
   },
   computed: {
@@ -127,7 +182,6 @@ export default {
 
 <style scoped>
 p {
-  font-weight: bold;
   color: tomato;
 }
 .text-right > button {

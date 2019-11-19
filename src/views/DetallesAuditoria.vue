@@ -69,8 +69,17 @@ export default {
       this.$http.get(`${this.$store.getters.getDireccion}/auditorias/${this.idAuditoria}`).then(response => {
         this.auditoria = response.data
       }).catch(() => {
-        alert('No hay conexión con el servidor')
-        this.$router.push({name: 'auditorias'})
+        this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+          title: 'Problemas de conexión',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        }).then(() => {
+          this.$router.push({name: 'auditorias'})
+        })
       })
     }
   },

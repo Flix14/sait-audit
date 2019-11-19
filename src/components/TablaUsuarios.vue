@@ -57,7 +57,17 @@ export default {
         })
         usuario.estado = response.data.estado
         this.$emit('estadoUpdating')
-      }).catch(() => alert('No hay conexión con la base de datos'))
+      }).catch(() => {
+        this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+          title: 'Problemas de conexión',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        })
+      })
     },
     updateListUsuarios(newUsuario) {
       var oldUsuario = this.usuarios.find(element => {

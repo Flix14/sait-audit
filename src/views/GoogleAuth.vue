@@ -30,15 +30,23 @@ export default {
           this.usuarioDB = res.data.usuarios
         }).catch(() => {
           this.handleClickSignOut()
-          alert('No hay conexión con el servidor')
+          this.$bvModal.msgBoxOk('No se ha podido establecer conexión con el servidor', {
+            title: 'Problemas de conexión',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'success',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
+            centered: true
+          })
         })
     },
     handleClickSignOut(){
       this.$gAuth.signOut()
       .then(() => {
       })
-      .catch(error  => {
-        alert(error)
+      .catch(() => {
+        this.$bvModal.msgBoxOk('Ha ocurrido un error inesperado')
       })
     }
   },
@@ -49,7 +57,15 @@ export default {
         this.$router.push({name: 'home'})
       } else{
         this.handleClickSignOut()
-        alert('No tiene autorización para entrar al sistema')
+        this.$bvModal.msgBoxOk('No tiene autorización para entrar al sistema', {
+          title: 'Problemas de autorización',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'success',
+          headerClass: 'p-2 border-bottom-0',
+          footerClass: 'p-2 border-top-0',
+          centered: true
+        })
       }
     }
   }

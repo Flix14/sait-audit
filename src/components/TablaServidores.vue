@@ -15,7 +15,7 @@
           <td>{{servidor.direccion_publica}}</td>
           <td>{{servidor.sistema_operativo}}</td>
           <td>{{servidor.dominio}}
-            <p v-for="dominio in servidor.dominios" :key="dominio.id">{{dominio.dominio}}</p>
+            <p v-for="(dominio, i) in servidor.dominios" :key="`${i}-${dominio.id}`">{{dominio.dominio}}</p>
           </td>
           <td class="text-center">
             <b-button 
@@ -62,6 +62,10 @@ export default {
           return servidor.id == newServidor.id
         })
       oldServidor.sistema_operativo = newServidor.sistema_operativo
+      oldServidor.dominios = []
+      newServidor.dominios.forEach(dominio => {
+        oldServidor.dominios.push(dominio)
+      });
     },
     openModalEditar(servidor) {
       this.servidorSeleccionado = servidor 

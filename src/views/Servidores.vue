@@ -80,8 +80,6 @@ export default {
       this.$http.get(`${this.$store.getters.getDireccion}/servidores?pagina=${this.currentPage}`).then(response => {
         this.servidores = response.data.servidores
         this.rows = response.data.pagina.total_elementos
-        this.query = ''
-        this.$refs.servTypeAhead.inputValue = ''
         this.conexion = true
       }).catch(() => this.conexion = false)
     },
@@ -139,7 +137,8 @@ export default {
     },
     tipoBusqueda: function() {
       this.currentPage = 1
-      this.getServidores()
+      this.query = ''
+      this.$refs.servTypeAhead.inputValue = ''
     }
   }
 }

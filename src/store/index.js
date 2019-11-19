@@ -10,7 +10,7 @@ export default new Vuex.Store({
       id: null,
       email: null
     },
-    direccion: 'http://192.168.1.136:3000'
+    direccion: 'http://localhost:3000'
   },
   mutations: {
     changeUsuario(state, usuario){

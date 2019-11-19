@@ -1,5 +1,11 @@
 <template>
-  <b-modal id="modalFechaPersonalizada" centered title="Rango de fechas">
+  <b-modal 
+  id="modalFechaPersonalizada" 
+  centered 
+  title="Rango de fechas" 
+  no-close-on-esc 
+  no-close-on-backdrop 
+  hide-header-close>
     <b-input-group prepend="De:">
       <b-input 
         v-model="fechaInicio" 

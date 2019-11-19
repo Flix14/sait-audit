@@ -5,7 +5,7 @@
         <tr>
           <th>ID</th>
           <th>Proyecto</th>
-          <th>IP Servidor</th>
+          <th>Servidor</th>
           <th>Usuario</th>
           <th>Motivo</th>
           <th>Fecha</th>

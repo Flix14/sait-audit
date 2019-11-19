@@ -1,5 +1,12 @@
 <template>
-  <b-modal id="modalVerServidoresDeProyectos" centered title="Servidores">
+  <b-modal 
+    id="modalVerServidoresDeProyectos" 
+    centered 
+    title="Servidores" 
+    @shown="getServidores()" 
+    no-close-on-esc 
+    no-close-on-backdrop 
+    hide-header-close>
     <table class="table table-hover table-bordered">
       <thead>
         <tr>
@@ -38,13 +45,11 @@ export default {
   methods: {
     closeModal(){
       this.$bvModal.hide('modalVerServidoresDeProyectos')
-    }
-  },
-  watch: {
-    idProyecto: function (val) {
+    },
+    getServidores() {
       var listaServidores = []
       this.servidores = []
-      this.$http.get(`${this.$store.getters.getDireccion}/proyectos/${val}/servidores`).then(response => {
+      this.$http.get(`${this.$store.getters.getDireccion}/proyectos/${this.idProyecto}/servidores`).then(response => {
         listaServidores = response.data
         listaServidores.forEach(servidor => {
           this.servidores.push({id: servidor.id, direccion_publica: servidor.direccion_publica})

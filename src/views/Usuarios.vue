@@ -88,8 +88,6 @@ export default {
       this.$http.get(selectQuery).then(response => {
         this.usuarios = response.data.usuarios
         this.rows = response.data.pagina.total_elementos
-        this.$refs.usTypeAhead.inputValue = '' //Al hacer esto se invoca dos veces, sucede en todas las tablas !!ARREGLAR
-        this.query = ''
         this.conexion = true
       }).catch(() => this.conexion = false)
     },
@@ -140,7 +138,11 @@ export default {
     },
     filtroEstadoSelected: function() {
       this.currentPage = 1
-      this.getUsuarios()
+      if(this.query == '') {
+        this.getUsuarios()
+      } else {
+        this.getUsuariosPerQuery()
+      }
     }
   }
 }

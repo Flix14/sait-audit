@@ -34,6 +34,18 @@ export default {
       this.$gAuth.signIn()
       .then(user => {
         this.$emit('newLoggin', {data: user, isAuth: this.isAuthorized})
+      }).catch(e => {
+        if(e.error == 'popup_closed_by_user') {
+          this.$bvModal.msgBoxOk('La ventana de inicio de sesión se ha cerrado', {
+            title: 'Aviso',
+            size: 'sm',
+            buttonSize: 'sm',
+            okVariant: 'success',
+            headerClass: 'p-2 border-bottom-0',
+            footerClass: 'p-2 border-top-0',
+            centered: true
+          })
+        }
       })
     },
     handleClickSignOut(){

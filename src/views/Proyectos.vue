@@ -71,8 +71,6 @@ export default {
       this.$http.get(`${this.$store.getters.getDireccion}/proyectos?pagina=${this.currentPage}`).then(response => {
         this.proyectos = response.data.proyectos
         this.rows = response.data.pagina.total_elementos
-        this.query = ''
-        this.$refs.proyectTypeAhead.inputValue = ''
         this.conexion = true
       }).catch(() => this.conexion = false)
     },
