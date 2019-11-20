@@ -17,6 +17,11 @@
         </b-navbar-nav>
       </b-collapse>
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+      <div>
+        <b-modal id="modal-progress" centered no-close-on-esc no-close-on-backdrop hide-header-close hide-footer hide-header>
+          <b-progress :value="progress" :max="100" animated></b-progress>
+        </b-modal>
+      </div>
     </b-navbar>
 </template>
 
@@ -26,7 +31,8 @@ export default {
     return {
       isSignIn: false,
       isInit: false,
-      usuario: ''
+      usuario: '',
+      progress: 0
     }
   },
   methods: {
@@ -62,6 +68,8 @@ export default {
       this.isInit = this.$gAuth.isInit
       this.isSignIn = this.$gAuth.isAuthorized
       if(this.isInit){
+        this.$bvModal.hide('modal-progress')
+        this.progress = 0
         clearInterval(checkGauthLoad)
         if(this.isSignIn) {
           this.usuario = this.$gAuth.GoogleAuth.currentUser.Ab.w3.U3
@@ -70,6 +78,14 @@ export default {
           this.$router.push({name: 'googleAuth'})
         } else {
           this.$store.commit('changeUsuario', {email: null, id: null})
+        }
+      } else if(this.$route.name != 'googleAuth'){
+        this.$bvModal.show('modal-progress')
+        this.progress += 10
+        if(this.progress > 1000) {
+          this.progress = 0
+          this.$bvModal.hide('modal-progress')
+          this.$router.push({name: 'googleAuth'})
         }
       }
     }, 100)

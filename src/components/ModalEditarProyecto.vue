@@ -129,7 +129,7 @@ export default {
     closeModal() {
       this.$bvModal.hide('modalEditarProyecto')
     },
-    getServidores() {
+    async getServidores() {
       var listaServidores = []
       this.servidoresExistentes = []
       this.$http.get(`${this.$store.getters.getDireccion}/servidores`).then(response => {
