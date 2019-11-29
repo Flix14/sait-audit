@@ -1,5 +1,10 @@
 # sait-auditorias
 
+## Primer uso
+```
+-Se necesita registrar un usuario directamente en la base de datos mariadb para tener acceso a la aplicación.
+-Cambiar API key de GoogleAuth por la propia.
+```
 ## Project setup
 ```
 npm install
